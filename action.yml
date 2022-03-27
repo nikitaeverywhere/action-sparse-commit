@@ -24,7 +24,7 @@ inputs:
   git-user-email:
     required: false
     description: The user email that will appear in git commit.
-    default: ${{ inputs.git-user-email }})@users.noreply.github.com
+    default: ''
   git-commit-message:
     required: false
     description: A commit message to use.
@@ -36,6 +36,7 @@ runs:
       shell: bash
       run: |
           DIRTEMP=${{ inputs.temp-dir }}
+          EMAIL=${{ inputs.git-user-email }}
           git clone --filter=blob:none --no-checkout ${{ inputs.repository }} $DIRTEMP
           git -C $DIRTEMP sparse-checkout init --cone
           git -C $DIRTEMP restore --staged .
@@ -47,6 +48,6 @@ runs:
           git -C $DIRTEMP status
 
           git -C $DIRTEMP config user.name "${{ inputs.git-user-name }}"
-          git -C $DIRTEMP config user.email "${{ inputs.git-user-email }}"
+          git -C $DIRTEMP config user.email "${EMAIL:-${{ inputs.git-user-name }}@users.noreply.github.com}"
           git -C $DIRTEMP commit -m '${{ inputs.git-commit-message }}' ${{ inputs.filename }}
           git -C $DIRTEMP push
