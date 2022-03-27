@@ -35,8 +35,8 @@ runs:
     - name: Set shell variables
       shell: bash
       run: |
-          DIRTEMP=${{ inputs.temp-dir }}
-          EMAIL=${{ inputs.git-user-email }}
+          echo "DIRTEMP=${{ inputs.temp-dir }}" >> $GITHUB_ENV
+          echo "EMAIL=${{ inputs.git-user-email }}" >> $GITHUB_ENV
 
     - name: Clone repository
       shell: bash
