@@ -32,21 +32,39 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Git sparse commit
+    - name: Set shell variables
       shell: bash
       run: |
           DIRTEMP=${{ inputs.temp-dir }}
           EMAIL=${{ inputs.git-user-email }}
+
+    - name: Clone repository
+      shell: bash
+      run: |
           git clone --filter=blob:none --no-checkout ${{ inputs.repository }} $DIRTEMP
           git -C $DIRTEMP sparse-checkout init --cone
           git -C $DIRTEMP restore --staged .
-          mkdir -p $(dirname ${{ inputs.filename }})
+
+    - name: Create subdirectories
+      shell: bash
+      run: |
+          mkdir -p $DIRTEMP/$(dirname ${{ inputs.filename }})
+
+    - name: Write a file
+      shell: bash
+      run: |
           echo '${{ inputs.file-content }}' > $DIRTEMP/${{ inputs.filename }}
 
+    - name: Git add and check status
+      shell: bash
+      run: |
           git -C $DIRTEMP sparse-checkout add ${{ inputs.filename }}
           git -C $DIRTEMP add ${{ inputs.filename }}
           git -C $DIRTEMP status
 
+    - name: Commit and push
+      shell: bash
+      run: |
           git -C $DIRTEMP config user.name "${{ inputs.git-user-name }}"
           git -C $DIRTEMP config user.email "${EMAIL:-${{ inputs.git-user-name }}@users.noreply.github.com}"
           git -C $DIRTEMP commit -m '${{ inputs.git-commit-message }}' ${{ inputs.filename }}
