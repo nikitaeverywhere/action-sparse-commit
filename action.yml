@@ -1,0 +1,49 @@
+name: Sparse commit to a repository
+description: Sparse checkout and commit to a single file of any git repository.
+author: zitros
+inputs:
+  repository:
+    required: true
+    description: URL of a repository to check out. Include credentials to this URL if needed.
+  filename:
+    required: true
+    description: A name of a file to commit, including directories, if any. Directories that do not exist will be created.
+  file-content:
+    required: true
+    description: A content of the file to commit.
+  git-user-name:
+    required: true
+    description: The user name that will appear in git commit.
+  temp-dir:
+    required: false
+    description: A temp directory where repository will be checked out.
+    default: temp-git-sparse-commit-${{ github.sha }}
+  git-user-email:
+    required: false
+    description: The user email that will appear in git commit.
+    default: ${{ inputs.git-user-email }})@users.noreply.github.com
+  git-commit-message:
+    required: false
+    description: A commit message to use.
+    default: Automated file update
+runs:
+  using: composite
+  steps:
+    - name: Git sparse commit
+      shell: bash
+      run: |
+          DIRTEMP=${{ inputs.temp-dir }}
+          git clone --filter=blob:none --no-checkout ${{ inputs.repository }} $DIRTEMP
+          git -C $DIRTEMP sparse-checkout init --cone
+          git -C $DIRTEMP restore --staged .
+          mkdir -p $(dirname ${{ inputs.filename }})
+          echo '${{ inputs.file-content }}' > $DIRTEMP/${{ inputs.filename }}
+
+          git -C $DIRTEMP sparse-checkout add ${{ inputs.filename }}
+          git -C $DIRTEMP add ${{ inputs.filename }}
+          git -C $DIRTEMP status
+
+          git -C $DIRTEMP config user.name "${{ inputs.git-user-name }}"
+          git -C $DIRTEMP config user.email "${{ inputs.git-user-email }}"
+          git -C $DIRTEMP commit -m '${{ inputs.git-commit-message }}' ${{ inputs.filename }}
+          git -C $DIRTEMP push
