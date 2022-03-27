@@ -1,6 +1,9 @@
 name: Sparse commit to a repository
 description: Sparse checkout and commit to a single file of any git repository.
 author: zitros
+branding:
+  icon: git-commit
+  color: orange
 inputs:
   repository:
     required: true
