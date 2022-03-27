@@ -1,7 +1,3 @@
-<p align="center">
-  <a href="https://github.com/ZitRos/action-sparse-commit/actions"><img alt="ZitRos/action-sparse-commit status" src="https://github.com/ZitRos/action-sparse-commit/workflows/build-test/badge.svg"></a>
-</p>
-
 # Sparse commit GitHub action
 
 Use this action to commit a single file into another git repository, for instance, for automation purposes to trigger
