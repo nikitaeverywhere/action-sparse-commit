@@ -65,7 +65,7 @@ runs:
 
     - shell: bash
       run: |
-          git -C $DIRTEMP sparse-checkout add "${{ inputs.filename }}"
+          git -C $DIRTEMP sparse-checkout add $(dirname "${{ inputs.filename }}")
 
     - shell: bash
       run: |
