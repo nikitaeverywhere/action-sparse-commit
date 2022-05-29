@@ -42,7 +42,15 @@ runs:
       shell: bash
       run: |
           git clone --filter=blob:none --no-checkout --depth 1 --sparse ${{ inputs.repository }} $DIRTEMP
+          
+    - name: Init sparse checkout
+      shell: bash
+      run: |
           git -C $DIRTEMP sparse-checkout init --cone
+          
+    - name: Reset a commit contents
+      shell: bash
+      run: |
           git -C $DIRTEMP restore --staged .
 
     - name: Create subdirectories
@@ -50,16 +58,21 @@ runs:
       run: |
           mkdir -p $DIRTEMP/$(dirname "${{ inputs.filename }}")
 
-    - name: Write a file
+    - name: Write to a file
       shell: bash
       run: |
           echo '${{ inputs.file-content }}' > "$DIRTEMP/${{ inputs.filename }}"
 
-    - name: Git add and check status
-      shell: bash
+    - shell: bash
       run: |
           git -C $DIRTEMP sparse-checkout add "${{ inputs.filename }}"
+
+    - shell: bash
+      run: |
           git -C $DIRTEMP add "${{ inputs.filename }}"
+          
+    - shell: bash
+      run: |
           git -C $DIRTEMP status
 
     - name: Commit and push
